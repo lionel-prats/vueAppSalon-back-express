@@ -1,0 +1,22 @@
+{
+  "name": "appsalon_mevn_backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend para AppSalon en MEVN",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --watch index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Lionel Prats @lionelprats",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.2"
+  }
+}
