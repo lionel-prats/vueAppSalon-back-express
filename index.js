@@ -11,7 +11,10 @@ dotenv.config()
 // configurar la app (v382)
 const app = express()
 
-// conectar a DB (v388)
+// habilito que mi app pueda leer la data que llegue en el body de peticiones POST, PUT, etc (v396)
+app.use(express.json())
+
+// conecto mi app al Cluster de MongoDB (v388)
 db()
 
 app.use("/api/services", servicesRoutes)
