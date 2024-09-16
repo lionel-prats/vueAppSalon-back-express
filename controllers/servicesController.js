@@ -1,6 +1,6 @@
 import { services } from "../data/beautyServices.js"
 import Services from "../models/Services.js"
-import mongoose from "mongoose" // v398
+// import mongoose from "mongoose"
 import { validateObjectId, handleNotFoundError } from "../utils/index.js"
 
 
@@ -45,20 +45,10 @@ const getServiceById = async (req, res) => {
 
 const updateService = async (req, res) => {
     const { id } = req.params
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        const error = new Error("El id no es válido")
-        return res.status(400).json({
-            msg: error.message
-        })
-    }
     
+    if(validateObjectId(id, res)) return
     const service = await Services.findById(id) // instancia del modelo Services
-    if(!service) {
-        const error = new Error("El servicio no existe")
-        return res.status(404).json({
-            msg: error.message
-        })
-    }
+    if(!service) return handleNotFoundError("El servicio no existe", res) 
 
     service.name = req.body.name || service.name
     service.price = req.body.price || service.price
