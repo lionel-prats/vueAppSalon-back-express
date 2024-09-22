@@ -12,6 +12,11 @@ function validateObjectId(id, res) {
     }
 }
 
+/*
+    - funcion para manejar la respuesta de un endpoint en caso de buscar un registro en DB y no encontrarlo
+    - forma de ejecutar esta utilidad desde un controlador vvv 
+        if(!service) return handleNotFoundError("El servicio no existe", res) 
+*/
 function handleNotFoundError(message, res) {
     const error = new Error(message)
     return res.status(404).json({
@@ -19,7 +24,11 @@ function handleNotFoundError(message, res) {
     })
 }
 
+// helper para generar un id unico (v433)
+const uniqueId = () => Date.now().toString(32) + Math.random().toString(32).substring(2)
+
 export {
     validateObjectId,
     handleNotFoundError,
+    uniqueId,
 }

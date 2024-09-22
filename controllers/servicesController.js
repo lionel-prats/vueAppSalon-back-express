@@ -58,9 +58,7 @@ const updateService = async (req, res) => {
 
     try {
         await service.save()
-        return res.json({
-            msg: "El servicio se actualizó correctamente"
-        })
+        return res.json({ msg: "El servicio se actualizó correctamente" })
     } catch (error) {
         console.log(error);
     }

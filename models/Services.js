@@ -5,7 +5,7 @@ const servicesSchema = mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        // default: "Nombre Servicio",
+        // default: "Nombre Servicio", // podemos setear un valos predeterminado para el campo en la tabla
     },
     price: {
         type: Number,

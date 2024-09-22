@@ -1,10 +1,11 @@
 // const express = require("express") // CommonJS (v384)
-import express from "express" // ESM (b384)
+import express from "express" // ESM (v384)
 import dotenv from "dotenv" // (dependencia para acceder a las variables de entorno del .env) v389
 import colors from "colors" // v391
 import cors from "cors" // v417
 import { db } from "./config/db.js"
 import servicesRoutes from "./routes/servicesRoutes.js"
+import authRoutes from "./routes/authRoutes.js" // router de autenticacion de usuarios (v434)
 
 
 // cargo las variobles de entorno (es como que este metodo de dotenv escanea las variables de entorno definidas en el .env) (v389)
@@ -38,7 +39,6 @@ const corsOptions = {
 app.use(cors(corsOptions))
 // fin configurar CORS
 
-app.use("/api/services", servicesRoutes)
 // definir una ruta (v382)
 /* 
 app.get("/", (req, res) => {
@@ -58,6 +58,8 @@ app.get("/", (req, res) => {
     res.json(products)
 }) 
 */
+app.use("/api/services", servicesRoutes)
+app.use("/api/auth", authRoutes)
 
 // definir puerto -> aca le asigno a PORT el valor de la variable de entorno PORT, y si esta no existe, le asigno el valor 4000 (v382)
 const PORT = process.env.PORT || 4000
