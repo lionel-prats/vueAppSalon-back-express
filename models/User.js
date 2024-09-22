@@ -49,5 +49,10 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, salt)
 })
 
+// creo el custom method checkPassword para verificar si el password pasado en el body de una request al endpoint de login de usuario (POST a http://localhost:4000/api/auth/login) coincide con el password registrado en DB para un usuario (v445) 
+userSchema.methods.checkPassword = async function(inputPassword) {
+    return await bcrypt.compare(inputPassword, this.password)
+}
+
 const User = mongoose.model("User", userSchema)
 export default User
