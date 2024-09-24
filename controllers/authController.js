@@ -35,7 +35,6 @@ const register = async (req, res) => {
         sendEmailVerification({ name, email, token })
         // fin bloque 
 
-        return res.status(200).json(result)
         return res.status(200).json({ msg: "El Usuario se creó correctamente, revisa tu email" })
     
     } catch (error) {
@@ -56,11 +55,10 @@ const verifyAccount = async (req, res) => {
         return res.status(401).json({ msg: error.message })
     }
     
-
     // en este punto, el token existe en DB, por lo que se trada de una nueva cuenta pendiente de confirmacion, asi que vonfirmamos la cuenta UPDATEANDO el campo verified como true y el campo token como null (v443)
     try {
         user.verified = true
-        user.token = null
+        user.token = ""
         await user.save()
         return res.status(200).json({ msg: "Usuario confirmado correctamente" })
     } catch (error) {
