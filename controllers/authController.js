@@ -1,6 +1,6 @@
 import User from "../models/User.js"
 import { sendEmailVerification } from "../emails/authEmailService.js" // v440
-// import { validateObjectId, handleNotFoundError } from "../utils/index.js"
+import { generateJWT } from "../utils/index.js" // v462
 
 // POST a http://localhost:4000/api/auth/register (registrar usuario)
 const register = async (req, res) => {
@@ -98,13 +98,18 @@ const login = async (req, res) => {
         return res.status(401).json({ msg: error.message })
     } 
 
-    const msg = "Usuario autenticado"
-    return res.status(200).json({ msg })
+    const token = generateJWT(user._id) // v462
+    return res.status(200).json({ token }) // v462
 }
 
+// GET a http://localhost:4000/api/auth/user (autenticar usuario) (v466)
+const user = async (req, res) => {
+    return res.status(200).json({ pipo: "pipo" })
+}
 
 export {
     register,
     verifyAccount,
     login,
+    user,
 }

@@ -1,4 +1,6 @@
 import mongoose from "mongoose" // v400
+import jwt from "jsonwebtoken"
+
 
 function validateObjectId(id, res) {
     // valido si el id recibido por URL es un ObjectId (tipo de ids de los registros o documentos en MongoDB) (v398)
@@ -27,8 +29,20 @@ function handleNotFoundError(message, res) {
 // helper para generar un id unico (v433)
 const uniqueId = () => Date.now().toString(32) + Math.random().toString(32).substring(2)
 
+// helper para generar un JSON Web Token (v462)
+const generateJWT = (id) => {
+    const token = jwt.sign(
+        { id },                // signature (firma) (objeto con el id del usuario)
+        process.env.JWT_SECRET, // private key (llave privada definida en el .env)
+        { expiresIn: "30d" },   // tiempo de expiracion del token (30 dias)
+    )
+    return token
+}
+
+
 export {
     validateObjectId,
     handleNotFoundError,
     uniqueId,
+    generateJWT,
 }
