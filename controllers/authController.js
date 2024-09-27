@@ -104,7 +104,13 @@ const login = async (req, res) => {
 
 // GET a http://localhost:4000/api/auth/user (autenticar usuario) (v466)
 const user = async (req, res) => {
-    return res.status(200).json({ pipo: "pipo" })
+    // cuando se ejecute este controlador, que es el de un endpoint protegido, significa que la request incluia un token valido (v469)  
+
+    // obtenemos de la DB la data del usuario que hizo la peticion, accediendo a la clave user del objeto request, cargada en el middleware \middleware\authMiddleware.js->authMiddleware() antes del next() (v469)
+    // esta data será una suerte de sesion de usuario (v469)
+    const { user } = req
+
+    return res.status(200).json(user)
 }
 
 export {
