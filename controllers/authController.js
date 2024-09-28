@@ -55,7 +55,7 @@ const verifyAccount = async (req, res) => {
         return res.status(401).json({ msg: error.message })
     }
     
-    // en este punto, el token existe en DB, por lo que se trada de una nueva cuenta pendiente de confirmacion, asi que vonfirmamos la cuenta UPDATEANDO el campo verified como true y el campo token como null (v443)
+    // en este punto, el token existe en DB, por lo que se trada de una nueva cuenta pendiente de confirmacion, asi que confirmamos la cuenta UPDATEANDO el campo verified como true y el campo token como null (v443)
     try {
         user.verified = true
         user.token = ""
@@ -104,7 +104,7 @@ const login = async (req, res) => {
 
 // GET a http://localhost:4000/api/auth/user (autenticar usuario) (v466)
 const user = async (req, res) => {
-    // cuando se ejecute este controlador, que es el de un endpoint protegido, significa que la request incluia un token valido (v469)  
+    // cuando se ejecute este controlador, que es el de un endpoint protegido, significa que ya validamos en el middleware que antepusimmos en la ruta definida en authRoutes.js que el header de la request incluia un token valido (v469)  
 
     // obtenemos de la DB la data del usuario que hizo la peticion, accediendo a la clave user del objeto request, cargada en el middleware \middleware\authMiddleware.js->authMiddleware() antes del next() (v469)
     // esta data será una suerte de sesion de usuario (v469)

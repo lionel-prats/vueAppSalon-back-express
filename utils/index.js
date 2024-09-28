@@ -34,7 +34,8 @@ const generateJWT = (id) => {
     const token = jwt.sign(
         { id },                // signature (firma) (objeto con el id del usuario)
         process.env.JWT_SECRET, // private key (llave privada definida en el .env)
-        { expiresIn: "30d" },   // tiempo de expiracion del token (30 dias)
+        // { expiresIn: "30d" },   // tiempo de expiracion del token (30 dias)
+        { expiresIn: "12h" },   // tiempo de expiracion del token (12 horas)
     )
     return token
 }

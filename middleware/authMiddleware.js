@@ -12,9 +12,10 @@ const authMiddleware = async(req, res, next) => {
     
             // decodifico el token para poder realizar todas las validaciones necesarias (v468)
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            // console.log(decoded); // para ver la decodificacion en la consola
             
             // intento encontar a un usuario en DB cuyo id coincida con el id que nos llegó en el token (nos llegó un id de usuario porque nosostros lo incluimos en el token de autenticacion que generamos desde /utils/index.js->generateJWT() y que retornamos desde el endpoint para autenticar a un usario) (v469)
-            // si lo encuentro, con lo funcion select() de mongoose filtro los campos que NO quiero obtener del registro encontrado (en este caso el password, verified, token y __v), porque no quiero incluirlos en los datos de usuario que voy a agregar al objeto request (v469)
+            // si lo encuentro, con la funcion select() de mongoose filtro los campos que NO quiero obtener del registro encontrado (en este caso el password, verified, token y __v), porque no quiero incluirlos en los datos de usuario que voy a agregar al objeto request (v469)
             // cargo la data del usuario encontrado a la request, para poder acceder a esta data desde el controlador (v469)
             req.user = await User.findById(decoded.id).select("-password -verified -token -__v")
             next()            
