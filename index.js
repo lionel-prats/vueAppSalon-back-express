@@ -1,11 +1,15 @@
+// este archivo es el entry point de mi aplicacion backend
+
 // const express = require("express") // CommonJS (v384)
 import express from "express" // ESM (v384)
+
 import dotenv from "dotenv" // (dependencia para acceder a las variables de entorno del .env) v389
 import colors from "colors" // v391
 import cors from "cors" // v417
 import { db } from "./config/db.js"
 import servicesRoutes from "./routes/servicesRoutes.js"
 import authRoutes from "./routes/authRoutes.js" // router de autenticacion de usuarios (v434)
+import appoinmentRoutes from "./routes/appoinmentRoutes.js" // router de gestion de citas (turnos) de usuarios (v473)
 
 
 // cargo las variobles de entorno (es como que este metodo de dotenv escanea las variables de entorno definidas en el .env) (v389)
@@ -60,6 +64,7 @@ app.get("/", (req, res) => {
 */
 app.use("/api/services", servicesRoutes)
 app.use("/api/auth", authRoutes)
+app.use("/api/appoinments", appoinmentRoutes) // routing a la gestion de citas (turnos) (v473)
 
 // definir puerto -> aca le asigno a PORT el valor de la variable de entorno PORT, y si esta no existe, le asigno el valor 4000 (v382)
 const PORT = process.env.PORT || 4000
