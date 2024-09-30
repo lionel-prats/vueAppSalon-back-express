@@ -2,6 +2,7 @@
 
 import Appoinment from "../models/Appoinment.js"
 import { parse, formatISO, startOfDay, endOfDay, isValid } from "date-fns" // funciones de la libreria date-fns, importada en v476 (v478)
+import { validateObjectId, handleNotFoundError } from "../utils/index.js" // v492
 
 const createAppoinment = async (req, res) => { // v474
     const appoinment = req.body
@@ -43,7 +44,27 @@ const getAppoinmentByDate = async (req, res) => { // v478
     return res.json(appoinments)
 }
 
+const getAppoinmentById = async (req, res) => { // v491
+
+    const { id } = req.params // obtengo el id de cita que vino en la URL
+    
+    // valido que el id de cita que vino en la URL sea un id valido en Mongo DB, caso contrario corto la ejecucion arrojando un error 400 (v492)
+    if(validateObjectId(id, res)) return
+
+
+    // en la DB, busco la cita por el id que vino en la URL (v492)
+    const appoinment = await Appoinment.findById(id) 
+
+    // si no existe la  cita retorno un 404 con el mensaje de error (v492)
+    if(!appoinment) return handleNotFoundError("La cita no existe", res) 
+
+
+    // retorno un 200 con la data de la cita (v492)
+    return res.json(appoinment)
+}
+
 export {
     createAppoinment,
     getAppoinmentByDate,
+    getAppoinmentById,
 }
