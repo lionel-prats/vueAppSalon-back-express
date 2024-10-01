@@ -44,6 +44,7 @@ const getAppoinmentByDate = async (req, res) => { // v478
     return res.json(appoinments)
 }
 
+// GET a http://localhost:4000/api/appoinments/:id_cita
 const getAppoinmentById = async (req, res) => { // v491
 
     const { id } = req.params // obtengo el id de cita que vino en la URL
@@ -53,18 +54,61 @@ const getAppoinmentById = async (req, res) => { // v491
 
 
     // en la DB, busco la cita por el id que vino en la URL (v492)
-    const appoinment = await Appoinment.findById(id) 
+    const appoinment = await Appoinment.findById(id).populate("services") 
 
     // si no existe la  cita retorno un 404 con el mensaje de error (v492)
     if(!appoinment) return handleNotFoundError("La cita no existe", res) 
 
+    // bloque para permitir el acceso al recurso solo si el usuario esta autenticado (token en el header) y es el propietario de la cita (si el usuario autenticado es admin tambien tendra acceso al recurso, pero es una demo fake) (v494)
+    const role = "user" 
+    if(appoinment.user.toString() !== req.user._id.toString() && role !== "admin") {
+        const error = new Error("No tienes los permisos")
+        return res.status(403).json({ msg: error.message })
+    }
 
     // retorno un 200 con la data de la cita (v492)
     return res.json(appoinment)
+}
+
+// PUT a http://localhost:4000/api/appoinments/:id_cita (v498)
+const updateAppoinment = async (req, res) => { 
+
+    const { id } = req.params // obtengo el id de cita que vino en la URL
+    
+    // valido que el id de cita que vino en la URL sea un id valido en Mongo DB, caso contrario corto la ejecucion arrojando un error 400 (v498)
+    if(validateObjectId(id, res)) return
+
+
+    // en la DB, busco la cita por el id que vino en la URL (v498)
+    const appoinment = await Appoinment.findById(id).populate("services") 
+
+    // si no existe la  cita retorno un 404 con el mensaje de error (v498)
+    if(!appoinment) return handleNotFoundError("La cita no existe", res) 
+
+    // bloque para permitir el el UPDATE de la cita solo si el usuario esta autenticado (token en el header) y es el propietario de la cita (si el usuario autenticado es admin tambien tendra acceso al recurso, pero es una demo fake) (v498)
+    const role = "user" 
+    if(appoinment.user.toString() !== req.user._id.toString() && role !== "admin") {
+        const error = new Error("No tienes los permisos")
+        return res.status(403).json({ msg: error.message })
+    }
+
+    const { date, time, totalAmount, services } = req.body
+    appoinment.date = date
+    appoinment.time = time
+    appoinment.totalAmount = totalAmount
+    appoinment.services = services
+
+    try {
+        await appoinment.save()
+        return res.json({ msg: "Cita Actualizada Correctamente" })
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 export {
     createAppoinment,
     getAppoinmentByDate,
     getAppoinmentById,
+    updateAppoinment,
 }

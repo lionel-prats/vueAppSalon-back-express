@@ -7,6 +7,7 @@ const getUserAppoinments = async (req, res) => { // v484
 
     const role = "user" // demo de como habilitar el acceso al recurso para un administrador no propietario de las citas (v485)
 
+    // bloque para permitir el acceso al recurso solo si el usuario esta autenticado (token en el header) y es el propietario de las citas (si el usuario autenticado es admin tambien tendra acceso al recurso, pero es una demo fake) (v486)
     if(user !== req.user._id.toString() && role !== "admin") {
         const error = new Error("Acceso Denegado")
         return res.status(400).json({ msg: error.message })
