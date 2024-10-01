@@ -106,9 +106,40 @@ const updateAppoinment = async (req, res) => {
     }
 }
 
+// DELETE a http://localhost:4000/api/appoinments/:id_cita (v501)
+const deleteAppoinment = async (req, res) => { 
+
+    const { id } = req.params // obtengo el id de cita que vino en la URL
+    
+    // valido que el id de cita que vino en la URL sea un id valido en Mongo DB, caso contrario corto la ejecucion arrojando un error 400 (v501)
+    if(validateObjectId(id, res)) return
+
+    // en la DB, busco la cita por el id que vino en la URL (v501)
+    const appoinment = await Appoinment.findById(id).populate("services") 
+
+    // si no existe la  cita retorno un 404 con el mensaje de error (v501)
+    if(!appoinment) return handleNotFoundError("La cita no existe", res) 
+
+    // bloque para permitir el DELETE de la cita solo si el usuario esta autenticado (token en el header) y es el propietario de la cita (si el usuario autenticado es admin tambien tendra acceso al recurso, pero es una demo fake) (v501)
+    const role = "user" 
+    if(appoinment.user.toString() !== req.user._id.toString() && role !== "admin") {
+        const error = new Error("No tienes los permisos")
+        return res.status(403).json({ msg: error.message })
+    }
+
+    try {
+        await appoinment.deleteOne()
+        return res.json({ msg: "Cita Cancelada Exitosamente" })
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
 export {
     createAppoinment,
     getAppoinmentByDate,
     getAppoinmentById,
     updateAppoinment,
+    deleteAppoinment,
 }
