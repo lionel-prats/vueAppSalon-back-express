@@ -2,14 +2,23 @@
 
 import Appoinment from "../models/Appoinment.js"
 import { parse, formatISO, startOfDay, endOfDay, isValid } from "date-fns" // funciones de la libreria date-fns, importada en v476 (v478)
-import { validateObjectId, handleNotFoundError } from "../utils/index.js" // v492
+import { validateObjectId, handleNotFoundError, formatDate } from "../utils/index.js" // v492|503
+import { sendEmailNewAppoinment, sendEmailUpdateAppoinment, sendEmailCancelledAppoinment } from "../emails/appoinmentEmailService.js" // v502|504
 
+// POST a http://localhost:4000/api/appoinments
 const createAppoinment = async (req, res) => { // v474
     const appoinment = req.body
     appoinment.user = req.user._id.toString()
     try {
         const newAppoinment = new Appoinment(appoinment) // instancia del modelo Appoinment (v475)
-        await newAppoinment.save()
+        const result = await newAppoinment.save()
+
+        // enviamos mail de notificacion de nueva cita al admin de appSalon (v502)
+        await sendEmailNewAppoinment({
+            date: formatDate(result.date), // formateamos la fecha ISO que viene de la DB a un string legible para el admin que va a recibir el mail (v503)
+            time: result.time,
+        })
+        
         const msg = "Tu Reservación se realizó Correctamente"
         return res.status(200).json({ msg })
     } catch (error) {
@@ -99,7 +108,14 @@ const updateAppoinment = async (req, res) => {
     appoinment.services = services
 
     try {
-        await appoinment.save()
+        const result = await appoinment.save()
+
+        // enviamos mail de notificacion de cita editada al admin de appSalon (v504)
+        await sendEmailUpdateAppoinment({
+            date: formatDate(result.date), // formateamos la fecha ISO que viene de la DB a un string legible para el admin que va a recibir el mail (v504)
+            time: result.time,
+        })
+
         return res.json({ msg: "Cita Actualizada Correctamente" })
     } catch (error) {
         console.log(error);
@@ -129,6 +145,13 @@ const deleteAppoinment = async (req, res) => {
 
     try {
         await appoinment.deleteOne()
+    
+        // enviamos mail de notificacion de cita cancelada al admin de appSalon (v505)
+        await sendEmailCancelledAppoinment({
+            date: formatDate(appoinment.date), // formateamos la fecha ISO que viene de la DB a un string legible para el admin que va a recibir el mail (v505)
+            time: appoinment.time,
+        })
+
         return res.json({ msg: "Cita Cancelada Exitosamente" })
     } catch (error) {
         console.log(error);

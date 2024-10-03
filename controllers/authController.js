@@ -55,7 +55,7 @@ const verifyAccount = async (req, res) => {
         return res.status(401).json({ msg: error.message })
     }
     
-    // en este punto, el token existe en DB, por lo que se trada de una nueva cuenta pendiente de confirmacion, asi que confirmamos la cuenta UPDATEANDO el campo verified como true y el campo token como null (v443)
+    // en este punto, el token existe en DB, por lo que se trata de una nueva cuenta pendiente de confirmacion, asi que confirmamos la cuenta UPDATEANDO el campo verified como true y el campo token como null (v443)
     try {
         user.verified = true
         user.token = ""

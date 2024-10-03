@@ -1,5 +1,8 @@
 import mongoose from "mongoose" // v400
 import jwt from "jsonwebtoken"
+import { format } from "date-fns" // v503
+// import es from "date-fns/locale/es/index.js" // paquete de idiomas es (español) de la libreria date-fns (v503)
+import es from "date-fns/locale/es" // paquete de idiomas es (español) de la libreria date-fns (v503)
 
 
 function validateObjectId(id, res) {
@@ -40,10 +43,15 @@ const generateJWT = (id) => {
     return token
 }
 
+// esta funcion recibe una fecha en formato ISO y la castea a un string de tipo "Friday, April 29th, 1453", usando funciones de la libreria date-fns, incluyendo su paquete de idioma "es" para traducir al español (v503)
+function formatDate(date) {
+    return format(date, "PPPP", { locale: es })
+}
 
 export {
     validateObjectId,
     handleNotFoundError,
     uniqueId,
     generateJWT,
+    formatDate,
 }
