@@ -1,6 +1,8 @@
 import User from "../models/User.js"
-import { sendEmailVerification } from "../emails/authEmailService.js" // v440
-import { generateJWT } from "../utils/index.js" // v462
+import { sendEmailVerification, sendEmailPasswordReset } from "../emails/authEmailService.js" // v440|v509
+import { generateJWT, uniqueId } from "../utils/index.js" // v507
+
+// Area Pública - rutas de autenticacion y registro de usuarios
 
 // POST a http://localhost:4000/api/auth/register (registrar usuario)
 const register = async (req, res) => {
@@ -102,6 +104,82 @@ const login = async (req, res) => {
     return res.status(200).json({ token }) // v462
 }
 
+// POST a http://localhost:4000/api/auth/forgot-password (v507)
+const forgotPassword = async (req, res) => {
+    // valido que no haya campos vacios
+    if(Object.values(req.body).includes("")) {
+        const error = new Error("Todos los campos son obligatorios")
+        return res.status(400).json({ msg: error.message })
+    }
+
+    // verifico si existe el usuario (v507)
+    const { email } = req.body
+
+    const user = await User.findOne({ email })
+    if(!user){
+        const error = new Error("El usuario no existe")
+        return res.status(404).json({ msg: error.message })
+    }
+
+    try {
+        user.token = uniqueId()
+        const result = await user.save()
+
+        // envío al usuario el email para recuperar password (v509)
+        const { name, email, token } = result
+        sendEmailPasswordReset({ name, email, token })
+       
+        return res.status(200).json({ msg: "Hemos enviado un email con las instrucciones" })
+    
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// GET a http://localhost:4000/api/auth/forgot-password/:token (verificar si existe usuario asociado al token recibido por URL para que pueda reestablecer su password) (v510)
+const verifyPasswordResetToken = async (req, res) => {   
+    const { token } = req.params
+    const isValidToken = await User.findOne({ token })
+    if(!isValidToken){
+        const error = new Error("Hubo un error, token no válido")
+        return res.status(400).json({ msg: error.message })
+    }
+    return res.status(200).json({ msg: "Token válido"})
+}
+
+// POST a http://localhost:4000/api/auth/forgot-password/:token (crea un nuevo password para un usuario, UPDATE user.password = req.body.password, user.token = "") (v512)
+const updatePassword = async (req, res) => {
+
+    const { token } = req.params
+    const user = await User.findOne({ token })
+    if(!user){
+        const error = new Error("Hubo un error, token no válido")
+        return res.status(400).json({ msg: error.message })
+    }
+
+    const { password } = req.body
+
+    try {
+        
+        user.token = ""
+        user.password = password
+
+        await user.save() // UPDATE user SET ... WHERE token = token 
+        
+        res.status(200).json({
+            msg: "Password modificado correctamente"
+        })
+    
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+// ------------------------------------------------------------------------------------
+
+// Area Privada - endpoints que requieren recibir un JWT valido en la peticion
+
 // GET a http://localhost:4000/api/auth/user (autenticar usuario) (v466)
 const user = async (req, res) => {
     // cuando se ejecute este controlador, que es el de un endpoint protegido, significa que ya validamos en el middleware que antepusimmos en la ruta definida en authRoutes.js que el header de la request incluia un token valido (v469)  
@@ -117,5 +195,8 @@ export {
     register,
     verifyAccount,
     login,
+    forgotPassword,
+    verifyPasswordResetToken,
+    updatePassword,
     user,
 }

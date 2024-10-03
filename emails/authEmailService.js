@@ -25,3 +25,30 @@ export async function sendEmailVerification({ name, email, token }) { // v440
 
     console.log("Mensaje enviado ", info.messageId);
 }
+
+// envio del email al correo de un usuario para que pueda recuperar su password // v509
+export async function sendEmailPasswordReset({ name, email, token }) {
+    const transporter = createTransport(
+        process.env.EMAIL_HOST,
+        process.env.EMAIL_PORT,
+        process.env.EMAIL_USER,
+        process.env.EMAIL_PASS,
+    )
+
+    // en este bloque se envia el email para recuperar password (v509)
+    const info = await transporter.sendMail({
+        from: "AppSalon <cuentas@appsalon.com>",
+        to: email,
+        subject: "AppSalon - Reestablece tu password",
+        text: "AppSalon - Reestablece tu password 2",
+        html: `
+            <p>Hola ${name}, has solicitado reestablecer tu password</p>
+            <p>Sigue el siguiente enlace para generar un nuevo password:</p>
+            <a href="${process.env.FRONTEND_URL}/auth/olvide-password/${token}">Reestablecer Password</a>
+            <p>Si tu no solicitaste esto, puedes ignorar este mensaje</p>
+        `
+    })
+    // fin bloque
+
+    console.log("Mensaje enviado ", info.messageId);
+}
