@@ -191,6 +191,17 @@ const user = async (req, res) => {
     return res.status(200).json(user)
 }
 
+// GET a http://localhost:4000/api/auth/admin (este endpoint valida tanto que el usuario este autenticado como que el usario sea admin) (v514)
+const admin = async (req, res) => {
+    const { user } = req
+    if(!user.admin) {
+        const error = new Error("Acción no válida")
+        return res.status(403).json({ msg: error.message })
+    }
+    return res.status(200).json(user)
+}
+
+
 export {
     register,
     verifyAccount,
@@ -199,4 +210,5 @@ export {
     verifyPasswordResetToken,
     updatePassword,
     user,
+    admin,
 }

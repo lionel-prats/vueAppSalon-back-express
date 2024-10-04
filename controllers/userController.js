@@ -2,6 +2,7 @@
 
 import Appoinment from "../models/Appoinment.js" // v485
 
+// GET a http://localhost:4000/api/users/:id_user/appoinments
 const getUserAppoinments = async (req, res) => { // v484
     const user = req.params.user
 
@@ -14,19 +15,18 @@ const getUserAppoinments = async (req, res) => { // v484
     }
 
     try {
-        
+        // armo la query con el filtro por user._id condicional dependiento de si el usuario autenticado es admin o no (v519)
+        const query = req.user.admin ? { date: { $gte: new Date() } } : { user, date: { $gte: new Date() } } 
+
         // SELECT 
         // * FROM appoinmentes 
-        // WHERE user = "66f219501fd96e1250825965" 
-        // AND date >= NOW()
-        const appoinments = await Appoinment.find({ // v485
-            user,
-            date: {
-                $gte: new Date()
-            } 
-        })
-        .populate("services") // agrego a la respuesta el detalle de cada uno de los servicios de una cita
-        .sort({ date: "asc" }) // ordeno la respuesta por el campo date desde la la cita con fecha mas antigua a la cita con fecha mas reciente (v488)
+        // WHERE date >= NOW()
+        // *** AND user._id = "66f219501fd96e1250825965" -- opcional, dependiendo de si el usuario autenticado es admin o no 
+        const appoinments = await Appoinment
+            .find(query)
+            .populate("services") // agrego a la respuesta el detalle de cada uno de los servicios de una cita
+            .populate({ path: "user", select: "name email" }) // enriquezco la respuesta con el name e email de owner de la cita (v521)
+            .sort({ date: "asc" }) // ordeno la respuesta por el campo date desde la la cita con fecha mas antigua a la cita con fecha mas reciente (v488)
         
         return res.status(200).json(appoinments)
     

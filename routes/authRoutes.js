@@ -1,5 +1,5 @@
 import express from "express"
-import { register, verifyAccount, login, forgotPassword, user, verifyPasswordResetToken, updatePassword } from "../controllers/authController.js"
+import { register, verifyAccount, login, forgotPassword, user, admin, verifyPasswordResetToken, updatePassword } from "../controllers/authController.js"
 import authMiddleware from "../middleware/authMiddleware.js" // v466
 
 const router = express.Router()
@@ -19,6 +19,7 @@ router.route("/forgot-password/:token")
 
 // Area Privada - endpoints que requieren recibir un JWT valido en la peticion (v466)
 router.get("/user", authMiddleware, user) // GET a http://localhost:4000/api/auth/user (v466)
+router.get("/admin", authMiddleware, admin) // GET a http://localhost:4000/api/auth/admin (este endpoint valida si el usuario autenticado es admin) (v514)
 
 
 export default router

@@ -26,6 +26,7 @@ const createAppoinment = async (req, res) => { // v474
     }
 }
 
+// GET a http://localhost:4000/api/appoinments?date=dd/mm/yyyy
 const getAppoinmentByDate = async (req, res) => { // v478
     const { date } = req.query // obtenemos la fecha "dd/mm/yyyy" de la URL
 
